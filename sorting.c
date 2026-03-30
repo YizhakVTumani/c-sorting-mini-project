@@ -10,7 +10,7 @@
 #define DELETE "\033[J"
 int steps = 0;
 int swaps = 0;
-int size = 12;
+int size = 50;
 int maxValue = 10;
 
 void shuffle (int* arr){
@@ -36,19 +36,19 @@ void printDiagram(int* arr, int a){
                 for (int j = 0; j < size; j++){
 			if(j == a || j == a+1){
 				if(i <= arr[j]){
-                                        printf(GREEN "\u2588\t" RESET);
+                                        printf(GREEN "\u2588" RESET);
                                 }
                                 else{
-                                         printf(" \t");
+                                         printf(" ");
                                 }
 
 			}
 			else{
                         	if(i <= arr[j]){
-                               		printf("\u2588\t");
+                               		printf("\u2588");
                         	}	
                         	else{
-                               		 printf(" \t");
+                               		 printf(" ");
                         	}
 			}
                 }
@@ -93,10 +93,10 @@ void printStartDiagram(int* arr){
 	for (int i = maxValue; i > 0; i--){
 		for (int j = 0; j < size; j++){
 			if(i <= arr[j]){
-				printf("\u2588\t");
+				printf("\u2588");
 			}
 			else{
-				printf(" \t");
+				printf(" ");
 			}
 		}
 		printf("\n");
@@ -105,15 +105,19 @@ void printStartDiagram(int* arr){
 
 
 
-int main(){
+int main(int argc, char *argv[]){
 	int steps = 0;
+	size = atoi(argv[2]);
 	int arr[size];
-	srand(time(NULL));
-	shuffle(arr);
-	printf(CLEAR DELETE);
-	printStartDiagram(arr);
-	usleep(1000000);
-	bubbleSort(arr);
+	if (strcmp(argv[1], "--bl") == 0){
+		srand(time(NULL));
+		shuffle(arr);
+		printf(CLEAR DELETE);
+		printStartDiagram(arr);
+		usleep(500000);
+		bubbleSort(arr);
+	
+	}
 	return 0;
 }
 
