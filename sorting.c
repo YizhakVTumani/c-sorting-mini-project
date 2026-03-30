@@ -10,8 +10,10 @@
 #define DELETE "\033[J"
 int steps = 0;
 int swaps = 0;
-int size = 50;
+int size = 10;
 int maxValue = 10;
+double seconds = 0.f;
+clock_t start;
 
 void shuffle (int* arr){
 	for (int i = 0; i < size; i++){
@@ -29,12 +31,14 @@ void resultPrint(int* arr){
 	printf("\n");
 }
 
-void printDiagram(int* arr, int a){
+void printDiagram(int* arr, int a, int b){
 	printf(CLEAR);
-	printf("Steps: %d\t Swaps: %d\n", steps, swaps);
+	clock_t step = clock();
+	seconds = (double)(step - start)/CLOCKS_PER_SEC;
+	printf("Steps: %d\t Swaps: %d\t Time: %.3f s\n", steps, swaps, seconds);
 	for (int i = maxValue; i > 0; i--){
                 for (int j = 0; j < size; j++){
-			if(j == a || j == a+1){
+			if(j == a || j == b){
 				if(i <= arr[j]){
                                         printf(GREEN "\u2588" RESET);
                                 }
@@ -60,7 +64,7 @@ void printDiagram(int* arr, int a){
 
 void playSound(int frequency){
 	char cmd[150];
-    	sprintf(cmd, "ffplay -f lavfi -i \"sine=f=%d:d=0.05\" -nodisp -autoexit > /dev/null 2>&1 &", 300 + frequency * 100);
+    	sprintf(cmd, "pkill -9 ffplay > /dev/null 2>&1; ffplay -f lavfi -i \"sine=f=%d:d=0.05\" -nodisp -autoexit > /dev/null 2>&1 &", 400 + frequency * 60);
     	system(cmd);
 }
 
@@ -70,8 +74,8 @@ int bubbleSort (int* arr){
 		finished = 1;
 		for (int j = 0; j < size-1; j++){
 			playSound(arr[j+1]);
-			usleep(20000);
-			printDiagram(arr, j);
+			usleep(50000);
+			printDiagram(arr, j, j+1);
 			steps++;
 			if (arr[j] > arr[j+1]){
 				swaps++;
@@ -87,6 +91,36 @@ int bubbleSort (int* arr){
 		}	
 	}
 	resultPrint(arr);
+}
+
+void quickSort(int *arr, int a, int b){
+	steps++;
+	if (a >= b){		
+		return ;
+	}
+	int r = arr[a];
+	int x = a-1;
+	int y = b+1;
+	while(x < y){
+		do{
+			x++;
+		}while(arr[x] < r);
+		
+		do{
+			y--;	
+		}while(arr[y] > r);
+		if( x < y){
+			playSound(arr[x]);
+			usleep(50000);
+			swaps++;
+			int temp = arr[x];
+			arr[x] = arr[y];
+			arr[y] = temp;
+			printDiagram(arr, x, y);
+		}
+	}
+	quickSort(arr, a, y);
+	quickSort(arr, y+1, b);
 }
 
 void printStartDiagram(int* arr){
@@ -113,9 +147,21 @@ int main(int argc, char *argv[]){
 		srand(time(NULL));
 		shuffle(arr);
 		printf(CLEAR DELETE);
+		start = clock();
 		printStartDiagram(arr);
 		usleep(500000);
 		bubbleSort(arr);
+	
+	}
+	if (strcmp(argv[1], "--qs") == 0){
+		srand(time(NULL));
+		shuffle(arr);
+		printf(CLEAR DELETE);
+		start = clock();
+		printStartDiagram(arr);
+		usleep(500000);
+		quickSort(arr, 0, size);
+		resultPrint(arr);
 	
 	}
 	return 0;
