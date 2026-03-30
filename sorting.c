@@ -14,6 +14,7 @@ int size = 10;
 int maxValue = 10;
 double seconds = 0.f;
 clock_t start;
+int speed = 1000;
 
 void shuffle (int* arr){
 	for (int i = 0; i < size; i++){
@@ -74,7 +75,7 @@ int bubbleSort (int* arr){
 		finished = 1;
 		for (int j = 0; j < size-1; j++){
 			playSound(arr[j+1]);
-			usleep(50000);
+			usleep(speed*5);
 			printDiagram(arr, j, j+1);
 			steps++;
 			if (arr[j] > arr[j+1]){
@@ -111,7 +112,7 @@ void quickSort(int *arr, int a, int b){
 		}while(arr[y] > r);
 		if( x < y){
 			playSound(arr[x]);
-			usleep(50000);
+			usleep(speed*5);
 			swaps++;
 			int temp = arr[x];
 			arr[x] = arr[y];
@@ -121,6 +122,23 @@ void quickSort(int *arr, int a, int b){
 	}
 	quickSort(arr, a, y);
 	quickSort(arr, y+1, b);
+}
+
+void insertionSort(int *arr) {
+    for (int i = 1; i < size; i++) {
+    	for (int j = i; j > 0; j--) {
+		steps++;
+		if(arr[j] < arr[j-1]){
+			swaps++;
+			int temp = arr[j-1];
+            		arr[j-1] = arr[j];
+			arr[j] = temp;
+            		printDiagram(arr, j, j-1);
+            		playSound(arr[j-1]);
+            		usleep(speed*5);
+		 }
+     	}
+    }
 }
 
 void printStartDiagram(int* arr){
@@ -138,18 +156,18 @@ void printStartDiagram(int* arr){
 }
 
 
-
 int main(int argc, char *argv[]){
 	int steps = 0;
 	size = atoi(argv[2]);
 	int arr[size];
+	speed = 1000*(atoi(argv[3]));
 	if (strcmp(argv[1], "--bl") == 0){
 		srand(time(NULL));
 		shuffle(arr);
 		printf(CLEAR DELETE);
 		start = clock();
 		printStartDiagram(arr);
-		usleep(500000);
+		usleep(speed*50);
 		bubbleSort(arr);
 	
 	}
@@ -159,10 +177,20 @@ int main(int argc, char *argv[]){
 		printf(CLEAR DELETE);
 		start = clock();
 		printStartDiagram(arr);
-		usleep(500000);
+		usleep(speed*50);
 		quickSort(arr, 0, size);
 		resultPrint(arr);
 	
+}
+	else if(strcmp(argv[1], "--ins") == 0){
+		srand(time(NULL));
+		shuffle(arr);
+		printf(CLEAR DELETE);
+		start = clock();
+		printStartDiagram(arr);
+		usleep(speed*50);
+		insertionSort(arr);
+		resultPrint(arr);
 	}
 	return 0;
 }
